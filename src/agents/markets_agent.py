@@ -1,94 +1,40 @@
-﻿"""Markets Agent - Specializes in investment advice and financial planning."""
+﻿"""Markets Agent - Investment advisor with Groq LLM."""
 
 from typing import Dict, Any
 from src.agents.base_agent import BaseAgent, AgentResponse
 
 
 class MarketsAgent(BaseAgent):
-    """
-    Markets Agent provides investment recommendations, SIP calculations,
-    and asset allocation advice based on user profile.
-    """
-    
     def __init__(self, llm_client=None):
         super().__init__("Markets Agent", llm_client)
     
     def respond(self, query: str, user_context: Dict[str, Any]) -> AgentResponse:
-        """
-        Generate investment recommendations based on user profile.
-        
-        Args:
-            query: User's investment-related query
-            user_context: Contains age, income, risk_profile
-            
-        Returns:
-            AgentResponse with investment advice
-        """
-        # Extract user financial profile
         age = user_context.get("age", 30)
         income = user_context.get("income", 50000)
-        risk_profile = user_context.get("risk_profile", "moderate")
+        risk = user_context.get("risk_profile", "moderate")
+        interests = user_context.get("interests", ["investing"])
         
-        # Calculate recommended SIP (Systematic Investment Plan)
-        sip_percentages = {
-            "conservative": 0.20,
-            "moderate": 0.30,
-            "aggressive": 0.40
-        }
-        sip_percentage = sip_percentages.get(risk_profile, 0.30)
-        sip_recommendation = int(income * sip_percentage)
-        
-        # Determine asset allocation based on age and risk
-        equity_portion = max(30, 100 - age)  # Younger = more equity
-        
-        if risk_profile == "conservative":
-            equity_portion = min(equity_portion, 50)
-        elif risk_profile == "aggressive":
-            equity_portion = min(equity_portion, 80)
-        
-        # Generate response
-        content = f"""
-📈 **Investment Recommendations**
+        prompt = f"""
+You are an expert investment advisor for The Economic Times.
 
-Based on your profile:
+USER PROFILE:
 - Age: {age}
 - Monthly Income: ₹{income:,}
-- Risk Profile: {risk_profile.title()}
+- Risk Profile: {risk}
+- Interests: {', '.join(interests)}
 
-**Recommended Monthly SIP:** ₹{sip_recommendation:,}
+USER QUESTION: {query}
 
-**Asset Allocation:**
-• Large Cap Funds: {int(equity_portion * 0.50)}%
-• Mid Cap Funds: {int(equity_portion * 0.30)}%
-• Small Cap Funds: {int(equity_portion * 0.20)}%
-• Debt/Fixed Income: {100 - equity_portion}%
+Provide a personalized investment plan with:
+1. Recommended monthly SIP amount
+2. Asset allocation percentages (large cap, mid cap, small cap, debt)
+3. 3 specific investment recommendations with reasoning
+4. Next steps
 
-**Top Picks for You:**
-1. **ET Markets Large Cap Fund** - Stable returns with low volatility
-2. **ELSS Tax Saver Fund** - Save tax under Section 80C
-3. **ET Markets Mid Cap Opportunities** - Higher growth potential
-
-**Next Steps:**
-• Read: "Beginner's Guide to Mutual Funds" on ET Prime
-• Track: Nifty 50 movement on ET Markets
-• Watch: Upcoming webinar on "Smart Investing for Beginners"
-
-💡 **Pro Tip**: Start with a monthly SIP and increase it by 10% every year to build wealth!
+Use emojis for sections. Keep concise (max 400 words).
 """
         
-        # Calculate confidence based on data completeness
-        confidence = 0.85
-        if not age or not income:
-            confidence = 0.60
-        elif risk_profile == "conservative":
-            confidence = 0.90  # Conservative profiles are easier to advise
+        content = self._call_llm(prompt)
+        confidence = 0.85 if user_context.get("age") else 0.65
         
-        return self._format_response(
-            content,
-            confidence,
-            sip_amount=sip_recommendation,
-            asset_allocation={
-                "equity": equity_portion,
-                "debt": 100 - equity_portion
-            }
-        )
+        return self._format_response(content, confidence)
