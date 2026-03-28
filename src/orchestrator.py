@@ -10,13 +10,7 @@ from src.agents.services_agent import ServicesAgent
 
 
 class ConciergeOrchestrator:
-    """
-    Orchestrator manages the multi-agent system:
-    - Routes queries to relevant agents
-    - Collects responses from all agents
-    - Scores and selects the best response
-    - Enables agents to "discuss" and collaborate
-    """
+    """Orchestrator manages the multi-agent system."""
     
     def __init__(self):
         """Initialize all agents."""
@@ -29,35 +23,28 @@ class ConciergeOrchestrator:
         }
     
     def process(self, query: str, user_context: Dict[str, Any]) -> str:
-        """
-        Process user query through the multi-agent system.
+        """Process user query through the multi-agent system."""
         
-        Args:
-            query: User's input/question
-            user_context: User profile data
-            
-        Returns:
-            Combined response from best agents
-        """
         print("\n" + "="*60)
         print("🎯 ORCHESTRATOR: Processing Query")
         print(f"Query: {query}")
         print("="*60)
         
-        # Step 1: Route to relevant agents based on query
+        # Step 1: Route to relevant agents
         relevant_agents = self._route_query(query)
         print(f"📡 Routing to: {', '.join(relevant_agents)}")
         
-        # Step 2: Get responses from all relevant agents (they "discuss")
+        # Step 2: Get responses from all relevant agents
         responses = []
         print("\n🤖 AGENTS DISCUSSING:")
         for agent_key in relevant_agents:
-            agent = self.agents[agent_key]
-            response = agent.respond(query, user_context)
-            responses.append(response)
-            print(f"   • {response.agent_name}: Confidence {response.confidence}")
+            if agent_key in self.agents:
+                agent = self.agents[agent_key]
+                response = agent.respond(query, user_context)
+                responses.append(response)
+                print(f"   • {response.agent_name}: Confidence {response.confidence}")
         
-        # Step 3: Score and select best response
+        # Step 3: Select best response
         best_response = self._select_best_response(responses)
         print(f"\n🏆 Selected: {best_response.agent_name} (Confidence: {best_response.confidence})")
         
@@ -68,81 +55,80 @@ class ConciergeOrchestrator:
         return final_output
     
     def _route_query(self, query: str) -> List[str]:
-        """
-        Determine which agents are relevant to the query.
-        
-        Args:
-            query: User's input
-            
-        Returns:
-            List of agent keys to activate
-        """
+        """Route to agents. Priority: learning > content > events > services > markets."""
         query_lower = query.lower()
         relevant = []
         
-        # Keyword-based routing
-        if any(word in query_lower for word in ["invest", "stock", "sip", "fund", "portfolio", "market"]):
-            relevant.append("markets")
-        
-        if any(word in query_lower for word in ["learn", "course", "masterclass", "skill", "career"]):
+        # HIGHEST PRIORITY: Learning/Courses
+        learning_keywords = ["learn", "course", "masterclass", "skill", "career", "education", "study", "teach", "training"]
+        if any(word in query_lower for word in learning_keywords):
             relevant.append("masterclass")
         
-        if any(word in query_lower for word in ["read", "article", "content", "news", "prime"]):
+        # CONTENT/ARTICLES - High priority for reading queries
+        content_keywords = ["read", "article", "content", "news", "prime", "blog", "story", "best article", "recommend article", "what to read"]
+        if any(word in query_lower for word in content_keywords):
             relevant.append("prime")
         
-        if any(word in query_lower for word in ["event", "summit", "webinar", "conference", "network"]):
+        # Events Agent
+        event_keywords = ["event", "summit", "webinar", "conference", "network", "meetup", "workshop", "seminar"]
+        if any(word in query_lower for word in event_keywords):
             relevant.append("events")
         
-        if any(word in query_lower for word in ["credit card", "loan", "insurance", "card", "finance product"]):
+        # Services Agent
+        service_keywords = ["credit card", "loan", "insurance", "card", "finance product"]
+        if any(word in query_lower for word in service_keywords):
             relevant.append("services")
         
-        # Default: if no specific intent, activate key agents
-        if not relevant:
-            relevant = ["markets", "prime"]
+        # Markets Agent - ONLY if not learning, content, or events
+        investment_keywords = ["invest", "stock", "sip", "fund", "portfolio", "market"]
+        is_learning_query = any(word in query_lower for word in learning_keywords)
+        is_content_query = any(word in query_lower for word in content_keywords)
+        is_event_query = any(word in query_lower for word in event_keywords)
         
-        return relevant
+        if any(word in query_lower for word in investment_keywords) and not is_learning_query and not is_content_query and not is_event_query:
+            relevant.append("markets")
+        
+        # Remove duplicates while preserving order
+        seen = set()
+        unique_relevant = []
+        for agent in relevant:
+            if agent not in seen:
+                seen.add(agent)
+                unique_relevant.append(agent)
+        
+        # Default
+        if not unique_relevant:
+            unique_relevant = ["markets", "prime"]
+        
+        return unique_relevant
     
     def _select_best_response(self, responses: List[AgentResponse]) -> AgentResponse:
-        """
-        Select the best response based on confidence scores.
-        Also combines responses if multiple have high confidence.
+        """Select the best response based on confidence scores."""
+        if not responses:
+            return AgentResponse(
+                agent_name="System",
+                content="I'm having trouble processing your request. Please try again.",
+                confidence=0.0,
+                metadata={}
+            )
         
-        Args:
-            responses: List of agent responses
-            
-        Returns:
-            Best response or combined response
-        """
-        # Sort by confidence
         sorted_responses = sorted(responses, key=lambda x: x.confidence, reverse=True)
         
-        # If top confidence > 0.8, use it
         if sorted_responses[0].confidence > 0.8:
             return sorted_responses[0]
         
-        # If top two are both > 0.7, combine them
         if len(sorted_responses) >= 2 and sorted_responses[1].confidence > 0.7:
             return self._combine_responses(sorted_responses[:2])
         
-        # Otherwise, return top
         return sorted_responses[0]
     
     def _combine_responses(self, top_responses: List[AgentResponse]) -> AgentResponse:
-        """
-        Combine multiple agent responses into one.
-        
-        Args:
-            top_responses: Top 2 agent responses
-            
-        Returns:
-            Combined response
-        """
-        combined_content = f"✨ **Personalized Recommendations** ✨\n\n"
-        combined_content += f"Based on your query, here's what our experts suggest:\n\n"
+        """Combine multiple agent responses."""
+        combined_content = "✨ **Personalized Recommendations** ✨\n\n"
         
         for response in top_responses:
             combined_content += f"**{response.agent_name}** says:\n"
-            combined_content += response.content[:300] + "...\n\n"
+            combined_content += response.content[:400] + "...\n\n"
         
         avg_confidence = sum(r.confidence for r in top_responses) / len(top_responses)
         
@@ -154,18 +140,9 @@ class ConciergeOrchestrator:
         )
     
     def _format_final_response(self, best_response: AgentResponse, all_responses: List[AgentResponse]) -> str:
-        """
-        Format the final output for display.
-        
-        Args:
-            best_response: Selected best response
-            all_responses: All agent responses
-            
-        Returns:
-            Formatted final response
-        """
+        """Format the final output."""
         output = "\n" + "="*60 + "\n"
-        output += f"🎯 **ET AI CONCIERGE RESPONSE**\n"
+        output += "🎯 **ET AI CONCIERGE RESPONSE**\n"
         output += "="*60 + "\n\n"
         
         output += best_response.content
