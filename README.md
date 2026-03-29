@@ -42,3 +42,16 @@ System:
 - If no agent matches → default assistant
 - If confidence < threshold → fallback agent
 - If multiple agents conflict → combine responses
+
+## 💰 Business Value
+This system enables:
+- Cross-selling across ET ecosystem
+- Increased subscriptions
+- Better user retention
+
+Example:
+User interested in investing →
+→ Recommend:
+   • ET Markets
+   • Masterclass
+   • Insurance
