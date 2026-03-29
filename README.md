@@ -1,9 +1,40 @@
-﻿# ET AI Concierge - Multi-Agent Personal Assistant
+# ET AI Concierge
 
-An AI-powered concierge for The Economic Times ecosystem using 5 specialized agents that collaborate to provide personalized recommendations across ET Prime, Markets, Masterclasses, Events, and Financial Services.
+## 🚨 Problem
+ET has a massive ecosystem, but users discover only 10% of it.
 
-## Problem Statement
-ET has a massive ecosystem but most users discover only 10% of what ET offers. Users are overwhelmed and miss valuable opportunities.
+## 💡 Solution
+An AI Concierge that:
+- Understands user in one conversation
+- Routes queries to specialized agents
+- Recommends personalized ET services
 
-## Our Solution
-A multi-agent AI concierge that understands users through natural conversation, activates specialized agents based on user needs, and delivers personalized guidance across ET's entire ecosystem.
+## 🔁 How It Works (IMPORTANT)
+
+User Query → Intent Detection → Agent Routing → Multi-Agent Discussion → Final Response
+
+Example:
+
+User: "I want to learn investing"
+
+System:
+→ Routes to Markets + Masterclass agents
+→ Combines responses
+→ Suggests:
+   • Investment plan
+   • Courses
+   • ET Prime articles
+
+## 🧠 Architecture
+(Insert diagram)
+
+## ⚙️ Tech Stack
+- Groq LLM
+- Python Agents
+- Streamlit UI
+
+## 🚀 Demo
+(Add screenshots)
+
+## 📊 Impact
+(With assumptions)
