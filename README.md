@@ -38,5 +38,3 @@ System:
 <img width="1920" height="878" alt="image" src="https://github.com/user-attachments/assets/e14736e2-7474-4b6a-9dbd-28b6b4c3b797" />
 <img width="1920" height="877" alt="image" src="https://github.com/user-attachments/assets/cb222f61-38b2-4f01-ba93-b941d35bbf14" />
 
-## 📊 Impact (with assumptions)
-(Add realistic numbers, not ₹65Cr blindly)
