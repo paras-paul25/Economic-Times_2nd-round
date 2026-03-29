@@ -1,0 +1,8 @@
+## Multi-Agent Workflow
+
+1. User enters query
+2. Orchestrator detects intent
+3. Routes to relevant agents
+4. Agents respond independently
+5. Confidence scores assigned
+6. Final response selected or merged
