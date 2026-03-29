@@ -128,7 +128,7 @@ class ConciergeOrchestrator:
         
         for response in top_responses:
             combined_content += f"**{response.agent_name}** says:\n"
-            combined_content += response.content[:400] + "...\n\n"
+            combined_content += response.content[:1000] + "...\n\n"
         
         avg_confidence = sum(r.confidence for r in top_responses) / len(top_responses)
         

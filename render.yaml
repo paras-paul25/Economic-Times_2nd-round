@@ -1,12 +1,15 @@
 ﻿services:
   - type: web
     name: et-ai-concierge
-    runtime: image
+    runtime: python
     repo: https://github.com/paras-paul25/Economic-Times_2nd-round
     plan: free
-    dockerfilePath: ./Dockerfile
+    buildCommand: |
+      pip install --upgrade pip
+      pip install protobuf==3.20.3
+      pip install streamlit==1.28.0
+      pip install -r requirements.txt
+    startCommand: streamlit run app.py --server.port $PORT --server.address 0.0.0.0
     envVars:
       - key: GROQ_API_KEY
         sync: false
-      - key: PYTHON_VERSION
-        value: 3.10.0
