@@ -1,11 +1,17 @@
-﻿FROM python:3.10-slim
+﻿# Use specific Python 3.10 image
+FROM python:3.10-slim-bookworm
 
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies including protobuf compiler
 RUN apt-get update && apt-get install -y \
     gcc \
+    g++ \
+    protobuf-compiler \
     && rm -rf /var/lib/apt/lists/*
+
+# Upgrade pip and install setuptools first
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 
 # Copy requirements first for better caching
 COPY requirements.txt .
