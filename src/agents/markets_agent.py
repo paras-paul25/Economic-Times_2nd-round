@@ -49,7 +49,7 @@ ACTION STEPS:
 CONFIDENCE: (0–1)
 """
 
-        content = self._call_llm(prompt, temperature=0.7)
+        content = self._call_llm(prompt)
 
         # Simple confidence (safe)
         confidence = 0.85 if user_context.get("age") else 0.65
