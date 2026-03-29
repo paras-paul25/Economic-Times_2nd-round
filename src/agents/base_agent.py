@@ -14,13 +14,22 @@ class AgentResponse(BaseModel):
     confidence: float = Field(..., ge=0.0, le=1.0, description="Confidence score")
     metadata: Dict[str, Any] = Field(default_factory=dict)
 
+    class Config:
+        arbitrary_types_allowed = True
+
 
 class BaseAgent(ABC):
     """Abstract base class with Groq LLM support."""
     
     def __init__(self, name: str, llm_client: Optional[Groq] = None):
         self.name = name
-        self.llm = llm_client or Groq(api_key=os.getenv("GROQ_API_KEY"))
+        if llm_client:
+            self.llm = llm_client
+        else:
+            api_key = os.getenv("GROQ_API_KEY")
+            if not api_key:
+                raise ValueError("GROQ_API_KEY environment variable not set")
+            self.llm = Groq(api_key=api_key)
         self.model = "llama-3.3-70b-versatile"
     
     @abstractmethod
