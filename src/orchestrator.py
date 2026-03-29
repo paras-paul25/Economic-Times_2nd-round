@@ -1,7 +1,7 @@
 ﻿"""Orchestrator - Manages agent collaboration and response selection."""
 
 from typing import Dict, Any, List
-from src.agents.base_agent import BaseAgent, AgentResponse
+from src.agents.base_agent import AgentResponse
 from src.agents.markets_agent import MarketsAgent
 from src.agents.masterclass_agent import MasterclassAgent
 from src.agents.prime_agent import PrimeAgent

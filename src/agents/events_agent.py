@@ -1,12 +1,12 @@
-﻿"""Events Agent - Event recommendations with Groq LLM."""
+﻿"""Events Agent - Event recommendations."""
 
 from typing import Dict, Any
 from src.agents.base_agent import BaseAgent, AgentResponse
 
 
 class EventsAgent(BaseAgent):
-    def __init__(self, llm_client=None):
-        super().__init__("Events Agent", llm_client)
+    def __init__(self):
+        super().__init__("Events Agent")
     
     def respond(self, query: str, user_context: Dict[str, Any]) -> AgentResponse:
         location = user_context.get("location", "India")

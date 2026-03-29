@@ -1,12 +1,12 @@
-﻿"""Services Agent - Financial product recommendations with Groq LLM."""
+﻿"""Services Agent - Financial product recommendations."""
 
 from typing import Dict, Any
 from src.agents.base_agent import BaseAgent, AgentResponse
 
 
 class ServicesAgent(BaseAgent):
-    def __init__(self, llm_client=None):
-        super().__init__("Services Agent", llm_client)
+    def __init__(self):
+        super().__init__("Services Agent")
     
     def respond(self, query: str, user_context: Dict[str, Any]) -> AgentResponse:
         income = user_context.get("income", 50000)

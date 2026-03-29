@@ -1,12 +1,12 @@
-﻿"""Masterclass Agent - Course recommendations with Groq LLM."""
+﻿"""Masterclass Agent - Course recommendations."""
 
 from typing import Dict, Any
 from src.agents.base_agent import BaseAgent, AgentResponse
 
 
 class MasterclassAgent(BaseAgent):
-    def __init__(self, llm_client=None):
-        super().__init__("Masterclass Agent", llm_client)
+    def __init__(self):
+        super().__init__("Masterclass Agent")
     
     def respond(self, query: str, user_context: Dict[str, Any]) -> AgentResponse:
         age = user_context.get("age", 30)
