@@ -64,8 +64,8 @@ class ConciergeOrchestrator:
         if any(word in query_lower for word in learning_keywords):
             relevant.append("masterclass")
         
-        # CONTENT/ARTICLES - High priority for reading queries
-        content_keywords = ["read", "article", "content", "news", "prime", "blog", "story", "best article", "recommend article", "what to read"]
+        # CONTENT/ARTICLES
+        content_keywords = ["read", "article", "content", "news", "prime", "blog", "story"]
         if any(word in query_lower for word in content_keywords):
             relevant.append("prime")
         
@@ -79,7 +79,7 @@ class ConciergeOrchestrator:
         if any(word in query_lower for word in service_keywords):
             relevant.append("services")
         
-        # Markets Agent - ONLY if not learning, content, or events
+        # Markets Agent
         investment_keywords = ["invest", "stock", "sip", "fund", "portfolio", "market"]
         is_learning_query = any(word in query_lower for word in learning_keywords)
         is_content_query = any(word in query_lower for word in content_keywords)
@@ -88,7 +88,7 @@ class ConciergeOrchestrator:
         if any(word in query_lower for word in investment_keywords) and not is_learning_query and not is_content_query and not is_event_query:
             relevant.append("markets")
         
-        # Remove duplicates while preserving order
+        # Remove duplicates
         seen = set()
         unique_relevant = []
         for agent in relevant:
@@ -125,10 +125,11 @@ class ConciergeOrchestrator:
     def _combine_responses(self, top_responses: List[AgentResponse]) -> AgentResponse:
         """Combine multiple agent responses."""
         combined_content = "✨ **Personalized Recommendations** ✨\n\n"
+        combined_content += "Based on your query, here's what our experts suggest:\n\n"
         
         for response in top_responses:
             combined_content += f"**{response.agent_name}** says:\n"
-            combined_content += response.content[:1000] + "...\n\n"
+            combined_content += response.content[:800] + "...\n\n"
         
         avg_confidence = sum(r.confidence for r in top_responses) / len(top_responses)
         

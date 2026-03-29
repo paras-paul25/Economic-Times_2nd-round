@@ -2,26 +2,23 @@
 
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Optional
-from pydantic import BaseModel, Field
 from groq import Groq
 import os
 
 
-class AgentResponse(BaseModel):
+class AgentResponse:
     """Standard response format for all agents."""
-    agent_name: str = Field(..., description="Name of the agent")
-    content: str = Field(..., description="Response content")
-    confidence: float = Field(..., ge=0.0, le=1.0, description="Confidence score")
-    metadata: Dict[str, Any] = Field(default_factory=dict)
-
-    class Config:
-        arbitrary_types_allowed = True
+    def __init__(self, agent_name: str, content: str, confidence: float, metadata: Dict[str, Any] = None):
+        self.agent_name = agent_name
+        self.content = content
+        self.confidence = confidence
+        self.metadata = metadata or {}
 
 
 class BaseAgent(ABC):
     """Abstract base class with Groq LLM support."""
     
-    def __init__(self, name: str, llm_client: Optional[Groq] = None):
+    def __init__(self, name: str, llm_client: Optional[Any] = None):
         self.name = name
         if llm_client:
             self.llm = llm_client
@@ -29,6 +26,7 @@ class BaseAgent(ABC):
             api_key = os.getenv("GROQ_API_KEY")
             if not api_key:
                 raise ValueError("GROQ_API_KEY environment variable not set")
+            # Initialize Groq client without extra arguments
             self.llm = Groq(api_key=api_key)
         self.model = "llama-3.3-70b-versatile"
     
